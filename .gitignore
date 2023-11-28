@@ -1,1 +1,9 @@
-# Moch data/data# IDE.idea.vscode# System.DS_Store
+# Moch data
+/data
+
+# IDE
+.idea
+.vscode
+
+# System
+.DS_Store
