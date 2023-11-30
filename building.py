@@ -1,7 +1,9 @@
+import os
 import tensorflow as tf
 
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Reshape, Flatten, Conv2D, Conv2DTranspose, BatchNormalization, LeakyReLU
+
 
 def build_generator(latent_dim):
     model = Sequential()
@@ -29,3 +31,20 @@ def build_discriminator(img_shape):
 def build_gan(generator, discriminator):
     model = Sequential([generator, discriminator])
     return model
+
+def build_and_compile_gan(latent_dim, img_shape, learning_rate=0.0002, beta_1=0.5):
+    discriminator = build_discriminator(img_shape)
+    discriminator.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate, beta_1=beta_1), metrics=['accuracy'])
+    discriminator.trainable = False
+
+    generator = build_generator(latent_dim)
+
+    gan = build_gan(generator, discriminator)
+    gan.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate, beta_1=beta_1))
+
+    rootDir = os.path.dirname(os.path.abspath(__file__))
+    workingWeightsDir = os.path.join(rootDir, 'weights', 'working_weights.h5')
+    generator.load_weights(workingWeightsDir)
+    print("Model was created successfully")
+
+    return gan, generator, discriminator
